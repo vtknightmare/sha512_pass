@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<META NAME="ROBOTS" CONTENT="NOINDEX">
+<META NAME="ROBOTS" CONTENT="NOFOLLOW">
+<title>SHA1_Pass v1.7</title>
+<body>
+
+<h1>SHA1_Pass v1.7</h1>
+
+<form name="sha1_pass_form">
+Sentence<input id="sentence" type="password" title="Type a sentence" maxlength=128 size="18">
+Word<input id="word" type="password" title="Type a word" maxlength=128 size="18">
+<br>
+<input type="checkbox" id="HMAC" title="Generate HMAC-SHA1 hashes rather than plain SHA1 hashes" name="HMAC"> HMAC
+<input type="checkbox" id="Complex" title="Add the string '.H0k' to the end of the password" name="Complex"> Complex
+<input type="button" title="Clear password, all fields and uncheck all checkboxes" value="Clear All" onClick="Clear_All()">
+<br>
+<input type="button" title="Generate Hex encoded password" value="Hex" onclick="derive_hex()">
+<input type="button" title="Generate Hex Half encoded password" value="Hex Half" onclick="derive_hex_half()">
+<input type="button" title="Generate Base64 encoded password" value="B64" onclick="derive_b64()">
+<input type="button" title="Generate Base64 Half encoded password" value="B64 Half" onclick="derive_b64_half()">
+</form>
+
+<div id="result" style="background-color:black;color:black;width:458px"></div>
+
+<script src="sha1.js"></script>
+<script>
+
+
+var complex_string = ".H0k";
+var timeout_period = 15000;
+var to = 0;
+
+
+function Clear()
+{
+    document.getElementById("result").innerHTML = "";
+}
+
+
+function Clear_All()
+{
+    document.sha1_pass_form.sentence.value = "";
+    document.sha1_pass_form.word.value = "";
+    document.sha1_pass_form.HMAC.checked = 0;
+    document.sha1_pass_form.Complex.checked = 0;
+    document.getElementById("result").innerHTML = "";
+}
+
+
+function display_message(hash, size)
+{
+    if ( size.toLowerCase() == "half" )
+    {
+        if ( document.sha1_pass_form.Complex.checked )
+            document.getElementById("result").innerHTML = hash.substring(0,hash.length/2).trim() + complex_string;
+        else
+            document.getElementById("result").innerHTML = hash.substring(0,hash.length/2).trim();
+    }
+
+    else
+    {
+        if ( document.sha1_pass_form.Complex.checked )
+            document.getElementById("result").innerHTML = hash.trim() + complex_string;
+        else
+            document.getElementById("result").innerHTML = hash.trim();
+    }
+
+    to = setTimeout( "Clear()", timeout_period );
+}
+
+
+function derive_hex()
+{
+    clearTimeout(to);
+
+	var sentence = document.sha1_pass_form.sentence.value;
+	var word = document.sha1_pass_form.word.value;
+
+	// Sanity checks
+	if (!sentence || !word)
+		return;
+
+    if ( document.sha1_pass_form.HMAC.checked )
+        display_message( hex_hmac_sha1(sentence + word, "SHA1_Pass"), "full" );  
+    else
+        display_message( hex_sha1(sentence + word), "full" );  
+}
+
+
+function derive_hex_half()
+{
+    clearTimeout(to);
+
+    var sentence = document.sha1_pass_form.sentence.value;
+	var word = document.sha1_pass_form.word.value;
+
+	// Sanity checks
+	if (!sentence || !word)
+		return;
+
+    if ( document.sha1_pass_form.HMAC.checked )
+        display_message( hex_hmac_sha1(sentence + word, "SHA1_Pass"), "half" );  
+    else
+        display_message( hex_sha1(sentence + word), "half" );  
+}
+
+
+function derive_b64()
+{
+    clearTimeout(to);
+
+    var sentence = document.sha1_pass_form.sentence.value;
+	var word = document.sha1_pass_form.word.value;
+
+	// Sanity checks
+	if (!sentence || !word)
+		return;
+
+    if ( document.sha1_pass_form.HMAC.checked )
+        display_message( b64_hmac_sha1(sentence + word, "SHA1_Pass"), "full" );  
+    else
+        display_message( b64_sha1(sentence + word), "full" );
+}
+
+
+function derive_b64_half()
+{
+    clearTimeout(to);
+
+    var sentence = document.sha1_pass_form.sentence.value;
+	var word = document.sha1_pass_form.word.value;
+
+	// Sanity checks
+	if (!sentence || !word)
+		return;
+
+    if ( document.sha1_pass_form.HMAC.checked )
+        display_message( b64_hmac_sha1(sentence + word, "SHA1_Pass"), "half" );  
+    else
+        display_message( b64_sha1(sentence + word), "half" );
+}
+
+
+</script>
+</body>
+</html>
